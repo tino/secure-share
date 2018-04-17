@@ -1,0 +1,9 @@
+[*.py]
+line_length = 99
+multi_line_output = 5
+balanced_wrapping = 1
+# known_first_party = administration,api,app,auth,customer_feedback,
+#     functional_tests,generic,geodata,grids,integrations,pvsystems,reports,
+#     solarservice,screenshotter,stats,status,website_api
+sections = FUTURE,STDLIB,THIRDPARTY,FIRSTPARTY,LOCALFOLDER
+default_section = THIRDPARTY
