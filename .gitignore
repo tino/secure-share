@@ -100,3 +100,6 @@ ENV/
 # mypy
 .mypy_cache/
 .vscode/
+
+# Frontend
+frontend/node_modules/
