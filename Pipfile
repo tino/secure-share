@@ -11,6 +11,7 @@ apistar = "*"
 "jinja2" = "*"
 hvac = "*"
 envparse = "*"
+ptpython = "*"
 
 
 [dev-packages]
