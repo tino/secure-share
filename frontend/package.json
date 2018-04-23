@@ -2,8 +2,10 @@
   "dependencies": {
     "@hyperapp/router": "^0.7.0",
     "babel-plugin-transform-react-jsx": "^6.24.1",
+    "browser-request": "^0.3.3",
     "hyperapp": "^1.2.5",
-    "parcel-bundler": "^1.7.1"
+    "parcel-bundler": "^1.7.1",
+    "urls": "^0.0.4"
   },
   "prettier": {
     "printWidth": 100,

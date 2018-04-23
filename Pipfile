@@ -7,7 +7,7 @@ name = "pypi"
 
 [packages]
 
-apistar = "*"
+apistar = "==0.5.4"
 "jinja2" = "*"
 hvac = "*"
 envparse = "*"
