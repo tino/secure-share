@@ -9,24 +9,19 @@ def homepage(app: App):
 
 
 class CORSHook:
-    headers = {
-        "Access-Control-Allow-Origin": "*",
-        "Access-Control-Allow-Methods": "*",
-        "Access-Control-Allow-Headers": "*",
-    }
 
     def on_response(self, request: http.Request, response: http.Response, exc: Exception):
-        if isinstance(exc, exceptions.MethodNotAllowed) and request.method == 'OPTIONS':
-            return http.Response('', status_code=204, headers=self.headers)
-
         response.headers["Access-Control-Allow-Origin"] = "*"
         response.headers["Access-Control-Allow-Methods"] = "*"
-        response.headers["Access-Control-Allow-Headers"] = "*"
-        return response
+        response.headers["Access-Control-Allow-Headers"] = (
+            "DNT,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Range"
+        )
 
-    def on_error(self, request: http.Request, response: http.Response, exc: Exception):
         if isinstance(exc, exceptions.MethodNotAllowed) and request.method == 'OPTIONS':
-            return http.Response('', status_code=204, headers=self.headers)
+            response.headers["Content-Type"] = "text/html"
+            response.status_code = 204
+            response.content = b''
+            return response
 
         return response
 
@@ -36,7 +31,7 @@ routes = [
     Include("/api/secrets", name="secrets", routes=secrets.routes),
 ]
 
-app = App(routes=routes, template_dir=settings.TEMPLATE_DIR)  #, event_hooks=[CORSHook()])
+app = App(routes=routes, template_dir=settings.TEMPLATE_DIR, event_hooks=[CORSHook()])
 
 # Dev server
 if __name__ == "__main__":
