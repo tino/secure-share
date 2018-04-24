@@ -11,5 +11,8 @@
     "printWidth": 100,
     "semi": false,
     "trailingComma": "all"
+  },
+  "devDependencies": {
+    "hyperapp-devtools": "^0.2.6"
   }
 }

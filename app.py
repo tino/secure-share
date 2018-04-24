@@ -4,8 +4,15 @@ import secrets
 import settings
 
 
-def homepage(app: App):
-    return app.render_template("home.html")
+def frontend():
+    with open('frontend/dist/index.html') as f:
+        return http.Response(f.read(), headers=dict(content_type='text/html'))
+
+
+def settings_() -> dict:
+    return {
+        'base_url': settings.BASE_URL,
+    }
 
 
 class CORSHook:
@@ -27,11 +34,13 @@ class CORSHook:
 
 
 routes = [
-    Route("/", method="GET", handler=homepage),
+    Route("/api/settings", method="GET", handler=settings_),
     Include("/api/secrets", name="secrets", routes=secrets.routes),
+    # Route("/", method="GET", handler=frontend, name='home'),
+    Route("/{path}", method="GET", handler=frontend, name='catchall'),
 ]
 
-app = App(routes=routes, template_dir=settings.TEMPLATE_DIR, event_hooks=[CORSHook()])
+app = App(routes=routes, static_dir=settings.STATIC_DIR, event_hooks=[CORSHook()])
 
 # Dev server
 if __name__ == "__main__":

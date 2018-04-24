@@ -1684,6 +1684,13 @@ https-browserify@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/https-browserify/-/https-browserify-1.0.0.tgz#ec06c10e0a34c0f2faf199f7fd7fc78fffd03c73"
 
+hyperapp-devtools@^0.2.6:
+  version "0.2.6"
+  resolved "https://registry.yarnpkg.com/hyperapp-devtools/-/hyperapp-devtools-0.2.6.tgz#cf89368ce199d2ee566fd4997ba39b4bd13ac1e0"
+  dependencies:
+    hyperapp "^1.2.5"
+    spectre.css "^0.5.1"
+
 hyperapp@^1.2.5:
   version "1.2.5"
   resolved "https://registry.yarnpkg.com/hyperapp/-/hyperapp-1.2.5.tgz#81eab50089413a6c0e85899abc2b9cd23393b9cc"
@@ -3156,6 +3163,10 @@ source-map@0.6.1, source-map@^0.6.1, source-map@~0.6.1:
 source-map@^0.5.3, source-map@^0.5.6, source-map@^0.5.7:
   version "0.5.7"
   resolved "https://registry.yarnpkg.com/source-map/-/source-map-0.5.7.tgz#8a039d2d1021d22d1ea14c80d8ea468ba2ef3fcc"
+
+spectre.css@^0.5.1:
+  version "0.5.1"
+  resolved "https://registry.yarnpkg.com/spectre.css/-/spectre.css-0.5.1.tgz#bd60345584bd88143f7d0930119c8f4bbd2822c7"
 
 split-string@^3.0.1, split-string@^3.0.2:
   version "3.1.0"

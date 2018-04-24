@@ -35,6 +35,7 @@ def new_secret(app: App, secret: Secret):
     token = new_cubbyhole(secret)
     return {
         'url': app.reverse_url('secrets:show_secret', token=token['auth']['client_token']),
+        'token': token['auth']['client_token'],
         'expiration': (
             datetime.datetime.now() +
             datetime.timedelta(seconds=token['auth']['lease_duration'])
@@ -67,5 +68,5 @@ routes = [
     Route('/new', method='POST', handler=new_secret),
     Route('/added', method='GET', handler=secret_added),
     Route('/show/{token}', method='GET', handler=show_secret),
-    Route('/show/{token}/content', method='GET', handler=show_secret_contents),
+    Route('/show/{token}/contents', method='GET', handler=show_secret_contents),
 ]
