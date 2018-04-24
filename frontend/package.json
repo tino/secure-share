@@ -14,5 +14,8 @@
   },
   "devDependencies": {
     "hyperapp-devtools": "^0.2.6"
+  },
+  "scripts": {
+    "dev": "parcel ./index.html --public-url=/static"
   }
 }
