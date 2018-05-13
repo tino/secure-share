@@ -1,3 +1,13 @@
 {
-    "plugins": [["transform-react-jsx", { "pragma": "h" }]]
-  }
+  "presets": [
+    [
+      "env",
+      {
+        "targets": {
+          "browsers": ["last 2 versions"]
+        }
+      }
+    ]
+  ],
+  "plugins": [["transform-react-jsx", { "pragma": "h" }], "transform-object-rest-spread"]
+}
