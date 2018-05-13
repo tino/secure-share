@@ -1,7 +1,9 @@
 {
   "dependencies": {
     "@hyperapp/router": "^0.7.0",
+    "babel-plugin-transform-object-rest-spread": "^6.26.0",
     "babel-plugin-transform-react-jsx": "^6.24.1",
+    "babel-preset-env": "^1.7.0",
     "browser-request": "^0.3.3",
     "hyperapp": "^1.2.5",
     "parcel-bundler": "^1.7.1",
