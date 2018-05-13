@@ -5,7 +5,9 @@ import urls from "../urls"
 export const Share = () => ({ settings, savedSecret }) => {
   let copyButtonText = "Copy"
   if (savedSecret) {
-    const url = urls.showSecret.replace("{token}", savedSecret.token)
+    const scheme = window.location.href.split(":")[0]
+    const domain = window.location.href.split("/")[2]
+    const url = `${scheme}://${domain}/show/${savedSecret.token}`
     return (
       <section class="hero is-bold is-success">
         <div class="hero-body is-text-center">
@@ -36,9 +38,6 @@ export const Share = () => ({ settings, savedSecret }) => {
                       }}
                       class="button is-medium is-white is-outlined"
                     >
-                      <span class="icon">
-                        <i class="fas fa-copy" />
-                      </span>{" "}
                       <span>{copyButtonText}</span>
                     </button>
                   </div>
