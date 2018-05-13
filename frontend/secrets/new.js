@@ -41,6 +41,7 @@ export const NewForm = () => (_, { saveNew, addError }) => {
             type="text"
             placeholder="Eg. &quot;password for account X&quot;"
             oninput={e => updateState("name", e.target.value)}
+            oncreate={e => e.focus()}
           />
           <span class="is-size-6 has-text-danger">
             Don't put any sensitive information in this field!

@@ -36,7 +36,7 @@ class CORSHook:
 routes = [
     Route("/api/settings", method="GET", handler=settings_),
     Include("/api/secrets", name="secrets", routes=secrets.routes),
-    # Route("/", method="GET", handler=frontend, name='home'),
+    Route("/", method="GET", handler=frontend, name='home'),
     Route("/{path}", method="GET", handler=frontend, name='catchall'),
 ]
 
