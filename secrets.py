@@ -28,10 +28,6 @@ def new_cubbyhole(secret: Secret):
     return token
 
 
-def new_secret_page(app: App):
-    return app.render_template("new_secret.html")
-
-
 def new_secret(app: App, secret: Secret):
     token = new_cubbyhole(secret)
     return {
@@ -62,14 +58,8 @@ def show_secret_contents(token: str):
         raise exceptions.NotFound
 
 
-def secret_added(app: App):
-    return app.render_template("secret_added.html")
-
-
 routes = [
-    Route("/new", method="GET", handler=new_secret_page),
     Route("/new", method="POST", handler=new_secret),
-    Route("/added", method="GET", handler=secret_added),
     Route("/show/{token}", method="GET", handler=show_secret),
     Route("/show/{token}/contents", method="GET", handler=show_secret_contents),
 ]

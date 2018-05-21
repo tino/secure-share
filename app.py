@@ -21,7 +21,8 @@ class CORSHook:
         response.headers["Access-Control-Allow-Origin"] = "*"
         response.headers["Access-Control-Allow-Methods"] = "*"
         response.headers["Access-Control-Allow-Headers"] = (
-            "DNT,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Range"
+            "DNT,User-Agent,X-Requested-With,If-Modified-Since,"
+            "Cache-Control,Content-Type,Range"
         )
 
         if isinstance(exc, exceptions.MethodNotAllowed) and request.method == "OPTIONS":
