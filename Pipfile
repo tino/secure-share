@@ -1,18 +1,13 @@
 [[source]]
-
 url = "https://pypi.python.org/simple"
 verify_ssl = true
 name = "pypi"
 
-
 [packages]
-
-apistar = "==0.5.4"
+apistar = "==0.5.22"
 "jinja2" = "*"
 hvac = "*"
 envparse = "*"
 ptpython = "*"
 
-
 [dev-packages]
-
