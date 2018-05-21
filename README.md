@@ -9,6 +9,6 @@
 - [x] UI page
 - [x] Add form to post secret
 - [x] Page to view secret
-- [ ] Display url to share nicely
-- [ ] Make form fields required
+- [x] Display url to share nicely
+- [x] Make form fields required
 - [ ] A lot more...

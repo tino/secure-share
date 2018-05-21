@@ -37,6 +37,9 @@ const actions = {
   },
 
   saveNew: ({ name, value }) => (state, actions) => {
+    if (!name || !value) {
+      throw new Error('Please fill in the name and value')
+    }
     request.post(
       {
         url: urls["new"],
@@ -152,7 +155,7 @@ const view = (state, actions) => (
         <Route
           path="/"
           render={() => {
-            ;<div>Hi!</div>
+            <div>Hi!</div>
           }}
         />
         <Route path="/new" render={NewForm} />
