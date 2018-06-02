@@ -38,7 +38,7 @@ const actions = {
 
   saveNew: ({ name, value }) => (state, actions) => {
     if (!name || !value) {
-      throw new Error('Please fill in the name and value')
+      throw new Error("Please fill in the name and value")
     }
     request.post(
       {
@@ -132,6 +132,36 @@ const actions = {
   },
 }
 
+const Home = () => {
+  return (
+    <section class="hero is-bold is-primary">
+      <div class="hero-body">
+        <div class="container">
+          <h1>A way to securely share a secret</h1>
+          <h2 class="subtitle">'Cuz keeping secrets all to yourself ain't fun!</h2>
+          <div class="level">
+            <div class="level-item">
+              <Link to="/new" class="button is-medium is-outlined is-link">
+                Share a secret 🔐
+              </Link>
+            </div>
+          </div>
+          <p>
+            Secure Share uses Hashicorp's Vault to store secrets. Secret's can only be retreived
+            with the storage url. If you loose the url, there is no way to retrieve the secret, not
+            even for the organisation running this service.
+          </p>
+          <p>
+            Extra protections besides the auto-expiring, unguessable url are offered in the form of
+            out-of-bound passwords. Secrets can be made "retreivable-once" too, ensuring only that
+            the secret has not been viewed before.
+          </p>
+        </div>
+      </div>
+    </section>
+  )
+}
+
 const Errors = () => ({ errors }) => {
   if (!errors) return
   return <ul>{errors.map(err => <li class="notification">{err.msg}</li>)}</ul>
@@ -139,25 +169,26 @@ const Errors = () => ({ errors }) => {
 
 const view = (state, actions) => (
   <div class="container">
-    <nav class="navbar" role="navigation" aria-label="main navigation">
+    <nav class="navbar is-transparent" role="navigation" aria-label="main navigation">
       <div class="navbar-brand">
         <Link to="/" class="navbar-item">
           <h1 class="title">🔐 SHARE</h1>
         </Link>
       </div>
-      <Link to="/new" class="navbar-item">
-        New
-      </Link>
+      <div class="navbar-menu is-active">
+        <div class="navbar-end">
+        <div class="navbar-item">
+          <Link to="/new" class="navbar-link">
+            New
+          </Link>
+        </div>
+        </div>
+      </div>
     </nav>
 
     <div class="">
       <Switch>
-        <Route
-          path="/"
-          render={() => {
-            <div>Hi!</div>
-          }}
-        />
+        <Route path="/" render={Home} />
         <Route path="/new" render={NewForm} />
         <Route path="/share" render={Share} />
         <Route
