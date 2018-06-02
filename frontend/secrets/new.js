@@ -1,6 +1,6 @@
 import { h } from "hyperapp"
 
-export const NewForm = () => (_, { saveNew, addError }) => {
+export const NewForm = () => (_, { saveNew, addError, location }) => {
   const localState = {
     name: "",
     value: "",
@@ -65,10 +65,18 @@ export const NewForm = () => (_, { saveNew, addError }) => {
             </div>
             <div class="field is-grouped">
               <div class="control">
-                <button class="button is-link">Submit</button>
+                <input type="submit" class="button is-link" value="Submit" />
               </div>
               <div class="control">
-                <button class="button is-text">Cancel</button>
+                <button
+                  onclick={e => {
+                    location.go("/")
+                    e.preventDefault()
+                  }}
+                  class="button is-text"
+                >
+                  Cancel
+                </button>
               </div>
             </div>
           </form>
