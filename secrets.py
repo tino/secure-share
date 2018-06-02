@@ -20,10 +20,14 @@ def new_cubbyhole(secret: Secret):
     Create a new token with a lifetime of a week, and with it store the secret
     in a cubbyhole.
     """
-    token = master_client.create_token(policies=["single-secure-share"], lease="168h")
+    token = master_client.create_token(
+        policies=["single-secure-share"],
+        lease="168h",
+        meta={"name": secret.name},
+    )
     client = hvac.Client(settings.VAULT_URL, token=token["auth"]["client_token"])
     client.write(
-        CUBBYHOLE_PATH, name=secret.name, value=secret.value, lease=f"{7 * 24}h"
+        CUBBYHOLE_PATH, value=secret.value, lease=f"{7 * 24}h"
     )
     return token
 

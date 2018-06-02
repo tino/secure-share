@@ -148,12 +148,12 @@ const Home = () => {
           </div>
           <p>
             Secure Share uses Hashicorp's Vault to store secrets. Secret's can only be retreived
-            with the storage url. If you loose the url, there is no way to retrieve the secret, not
+            with the storage url. If you lose the url, there is no way to retrieve the secret, not
             even for the organisation running this service.
           </p>
           <p>
             Extra protections besides the auto-expiring, unguessable url are offered in the form of
-            out-of-bound passwords. Secrets can be made "retreivable-once" too, ensuring only that
+            out-of-bound passwords. Secrets can be made "retreivable-once" too, ensuring that
             the secret has not been viewed before.
           </p>
         </div>

@@ -8,15 +8,16 @@ export const Show = ({ showState, showActions }) => ({ match }) => (
       <div class="container">
         {showState &&
           showState.data && (
+            <div>
+            <h1>{showState.data.meta.name}</h1>
             <dl>
               <dt>Expires</dt>
               <dd>{showState.data.expire_time}</dd>
             </dl>
+            </div>
           )}
         {showState.secret && (
           <dl>
-            <dt>Name</dt>
-            <dd>{showState.secret.data.name}</dd>
             <dt>Value</dt>
             <dd>
               <div class="columns">
@@ -25,7 +26,6 @@ export const Show = ({ showState, showActions }) => ({ match }) => (
                     <input
                       value={showState.secret.data.value}
                       class="input is-medium"
-                      onclick={e => e.target.select()}
                       oncreate={e => e.select()}
                       id="secret"
                     />
