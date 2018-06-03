@@ -6,6 +6,7 @@
     "babel-preset-env": "^1.7.0",
     "browser-request": "^0.3.3",
     "hyperapp": "^1.2.5",
+    "hyperapp-context": "^1.0.4",
     "parcel-bundler": "^1.7.1",
     "urls": "^0.0.4"
   },

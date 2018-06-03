@@ -1,12 +1,17 @@
 import { h, app } from "hyperapp"
+// import {withContext} from 'hyperapp-context'
 import { NewForm } from "./secrets/new"
 import { Share } from "./secrets/share"
 import { Show, showActions } from "./secrets/show"
 import { Link, Route, Switch, location } from "@hyperapp/router"
+
 import request from "browser-request"
 import urls from "./urls"
 
 import devtools from "hyperapp-devtools"
+// const devtools = (app) => app
+
+// const app = withContext(_app)
 
 const state = {
   location: location.state,
@@ -34,27 +39,6 @@ const actions = {
 
   setSettings: settings => {
     return state => ({ settings })
-  },
-
-  saveNew: ({ name, value }) => (state, actions) => {
-    if (!name || !value) {
-      throw new Error("Please fill in the name and value")
-    }
-    request.post(
-      {
-        url: urls["new"],
-        json: { name, value },
-      },
-      (err, response, body) => {
-        if (err) {
-          alert(err)
-          return false
-        }
-        if (response.status == 200) {
-          actions.displaySaveSuccess(body)
-        }
-      },
-    )
   },
 
   displaySaveSuccess: savedSecret => {
@@ -153,8 +137,8 @@ const Home = () => {
           </p>
           <p>
             Extra protections besides the auto-expiring, unguessable url are offered in the form of
-            out-of-bound passwords. Secrets can be made "retreivable-once" too, ensuring that
-            the secret has not been viewed before.
+            out-of-bound passwords. Secrets can be made "retreivable-once" too, ensuring that the
+            secret has not been viewed before.
           </p>
         </div>
       </div>
@@ -177,11 +161,11 @@ const view = (state, actions) => (
       </div>
       <div class="navbar-menu is-active">
         <div class="navbar-end">
-        <div class="navbar-item">
-          <Link to="/new" class="navbar-link">
-            New
-          </Link>
-        </div>
+          <div class="navbar-item">
+            <Link to="/new" class="navbar-link">
+              New
+            </Link>
+          </div>
         </div>
       </div>
     </nav>
@@ -189,7 +173,7 @@ const view = (state, actions) => (
     <div class="">
       <Switch>
         <Route path="/" render={Home} />
-        <Route path="/new" render={NewForm} />
+        <Route path="/new" render={() => <NewForm addError={actions.addError} />} />
         <Route path="/share" render={Share} />
         <Route
           parent

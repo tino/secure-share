@@ -1,4 +1,5 @@
 import datetime
+import json
 import os
 
 import hvac
@@ -10,9 +11,14 @@ from vault import master_client
 CUBBYHOLE_PATH = os.path.join(settings.VAULT_SECRET_BASE, "secret")
 
 
-class Secret(types.Type):
+class SecretField(types.Type):
     name = validators.String(max_length=100)
     value = validators.String(max_length=100)
+
+
+class Secret(types.Type):
+    name = validators.String(max_length=100)
+    fields = validators.Array(items=SecretField, min_items=1)
 
 
 def new_cubbyhole(secret: Secret):
@@ -21,14 +27,11 @@ def new_cubbyhole(secret: Secret):
     in a cubbyhole.
     """
     token = master_client.create_token(
-        policies=["single-secure-share"],
-        lease="168h",
-        meta={"name": secret.name},
+        policies=["single-secure-share"], lease="168h", meta={"name": secret.name}
     )
     client = hvac.Client(settings.VAULT_URL, token=token["auth"]["client_token"])
-    client.write(
-        CUBBYHOLE_PATH, value=secret.value, lease=f"{7 * 24}h"
-    )
+    fields = {field["name"]: field["value"] for field in secret.fields}
+    client.write(CUBBYHOLE_PATH, lease=f"{7 * 24}h", **fields)
     return token
 
 
