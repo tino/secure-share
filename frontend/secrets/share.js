@@ -24,8 +24,8 @@ export const Share = () => ({ settings, savedSecret }) => {
                         id="urlInput"
                         type="text"
                         value={url}
-                        onclick={(e) => e.target.select()}
                         oncreate={e => e.select()}
+                        readonly
                       />
                     </div>
                   </div>

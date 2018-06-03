@@ -28,6 +28,7 @@ export const Show = ({ showState, showActions }) => ({ match }) => (
                       class="input is-medium"
                       oncreate={e => e.select()}
                       id="secret"
+                      readonly
                     />
                   </div>
                 </div>
