@@ -2,12 +2,12 @@ import { h } from "hyperapp"
 import { location } from "@hyperapp/router"
 import urls from "../urls"
 
-export const Share = () => ({ settings, savedSecret }) => {
+export const Share = () => ({ settings, newSecret }) => {
   let copyButtonText = "Copy"
-  if (savedSecret) {
+  if (newSecret) {
     const scheme = window.location.href.split(":")[0]
     const domain = window.location.href.split("/")[2]
-    const url = `${scheme}://${domain}/show/${savedSecret.token}`
+    const url = `${scheme}://${domain}/show/${newSecret.token}`
     return (
       <section class="hero is-bold is-success">
         <div class="hero-body is-text-center">
@@ -45,7 +45,7 @@ export const Share = () => ({ settings, savedSecret }) => {
               </dd>
 
               <dt>Valid until</dt>
-              <dd>{savedSecret.expiration}</dd>
+              <dd>{newSecret.expiration}</dd>
             </dl>
           </div>
         </div>

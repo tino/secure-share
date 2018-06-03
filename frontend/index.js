@@ -17,9 +17,8 @@ const state = {
   location: location.state,
   user: null,
   errors: [],
-  savedSecret: null,
+  newSecret: null,
   settings: {},
-  show: { foo: "bar" },
 }
 
 const actions = {
@@ -37,6 +36,8 @@ const actions = {
     })
   },
 
+  storeNewSecret: newSecret => ({ newSecret }),
+
   setSettings: settings => {
     return state => ({ settings })
   },
@@ -47,73 +48,6 @@ const actions = {
   },
 
   addError: error => state => ({ errors: state.errors.concat([{ msg: error.message }]) }),
-
-  show: {
-    lookupToken(token) {
-      return (show, actions) => {
-        if (!token) {
-          location.actions.go("/")
-          return
-        }
-        if (!(show.data || show.error)) {
-          request.get(
-            { url: urls["showSecret"].replace("{token}", token), json: true },
-            (err, response, body) => {
-              if (err) {
-                alert(`Couldn't load secret: ${err}`)
-                return
-              }
-              console.debug(response)
-              switch (response.statusCode) {
-                case 200:
-                  actions.setSecret(body)
-                  break
-
-                case 404:
-                  actions.setSecret({ error: "Not found" })
-
-                default:
-                  break
-              }
-            },
-          )
-        }
-      }
-    },
-
-    setSecret(data) {
-      return (state, actions) => {
-        console.debug(data)
-        return data
-      }
-    },
-
-    reveal() {
-      return (showState, actions) => {
-        request.get(
-          { url: urls["showSecretContents"].replace("{token}", showState.data.id), json: true },
-          (err, response, body) => {
-            if (err) {
-              alert(`Couldn't load secret contents: ${err}`)
-              return
-            }
-            console.debug(response)
-            switch (response.statusCode) {
-              case 200:
-                actions.setSecret({ secret: body })
-                break
-
-              case 404:
-                actions.setSecret({ error: "Not found" })
-
-              default:
-                break
-            }
-          },
-        )
-      }
-    },
-  },
 }
 
 const Home = () => {
@@ -173,13 +107,19 @@ const view = (state, actions) => (
     <div class="">
       <Switch>
         <Route path="/" render={Home} />
-        <Route path="/new" render={() => <NewForm addError={actions.addError} />} />
-        <Route path="/share" render={Share} />
         <Route
-          parent
-          path="/show/:token"
-          render={Show({ showState: state.show, showActions: actions.show })}
+          path="/new"
+          render={({ location, match }) => (
+            <NewForm
+              done={secret => {
+                actions.storeNewSecret(secret)
+                actions.location.go(`/share`)
+              }}
+            />
+          )}
         />
+        <Route path="/share" render={Share} />
+        <Route parent path="/show/:token" render={Show} />
       </Switch>
       <Errors />
     </div>

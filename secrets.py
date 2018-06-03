@@ -30,8 +30,7 @@ def new_cubbyhole(secret: Secret):
         policies=["single-secure-share"], lease="168h", meta={"name": secret.name}
     )
     client = hvac.Client(settings.VAULT_URL, token=token["auth"]["client_token"])
-    fields = {field["name"]: field["value"] for field in secret.fields}
-    client.write(CUBBYHOLE_PATH, lease=f"{7 * 24}h", **fields)
+    client.write(CUBBYHOLE_PATH, lease=f"{7 * 24}h", fields=[dict(f) for f in secret.fields])
     return token
 
 

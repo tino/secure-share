@@ -19,8 +19,8 @@ export const NewForm = nestable(
     updateState(update) {
       return update
     },
-    saveNew: () => (state, actions) => {
-      const { name, field1Value, field2Value } = state
+    saveNew: (done) => (state, actions) => {
+      const { name, field1Type, field1Value, field2Type, field2Value } = state
       if (!name) {
         throw new Error("Please fill in a name!")
       }
@@ -30,7 +30,13 @@ export const NewForm = nestable(
       request.post(
         {
           url: urls["new"],
-          json: { name, field1Value, field2Value },
+          json: {
+            name,
+            fields: [
+              { name: field1Type, value: field1Value },
+              { name: field2Type, value: field2Value },
+            ],
+          },
         },
         (err, response, body) => {
           if (err) {
@@ -38,7 +44,7 @@ export const NewForm = nestable(
             return false
           }
           if (response.status == 200) {
-            location.actions.go(`/share#${body}`)
+            done(body)
           }
         },
       )
@@ -46,7 +52,7 @@ export const NewForm = nestable(
   },
 
   // VIEW
-  (state, actions) => ({ addError }, _) => {
+  (state, actions) => ({ done }) => {
     return (
       <section class="hero">
         <div class="hero-body">
@@ -54,17 +60,13 @@ export const NewForm = nestable(
             <form
               class="new-form"
               onsubmit={e => {
-                try {
-                  actions.saveNew()
-                } catch (error) {
-                  addError(error)
-                }
+                actions.saveNew(done)
                 e.preventDefault()
               }}
               onkeypress={e => {
                 const keyCode = e.keyCode || e.which
                 if (keyCode === 13) {
-                  actions.submit()
+                  actions.saveNew(done)
                   e.preventDefault()
                 }
               }}
