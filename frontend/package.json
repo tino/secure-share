@@ -1,14 +1,6 @@
 {
   "dependencies": {
-    "@hyperapp/router": "^0.7.0",
-    "babel-plugin-transform-object-rest-spread": "^6.26.0",
-    "babel-plugin-transform-react-jsx": "^6.24.1",
-    "babel-preset-env": "^1.7.0",
-    "browser-request": "^0.3.3",
-    "hyperapp": "^1.2.5",
-    "hyperapp-context": "^1.0.4",
-    "parcel-bundler": "^1.7.1",
-    "urls": "^0.0.4"
+    "mithril": "^1.1.6"
   },
   "prettier": {
     "printWidth": 100,
@@ -16,7 +8,10 @@
     "trailingComma": "all"
   },
   "devDependencies": {
-    "hyperapp-devtools": "^0.2.6"
+    "babel-plugin-transform-object-rest-spread": "^6.26.0",
+    "babel-plugin-transform-react-jsx": "^6.24.1",
+    "babel-preset-env": "^1.7.0",
+    "parcel-bundler": "^1.7.1"
   },
   "scripts": {
     "dev": "parcel ./index.html --public-url=/static"

@@ -1,60 +1,51 @@
-import { h, app } from "hyperapp"
-// import {withContext} from 'hyperapp-context'
 import { NewForm } from "./secrets/new"
 import { Share } from "./secrets/share"
-import { Show, showActions } from "./secrets/show"
-import { Link, Route, Switch, location } from "@hyperapp/router"
+import { Show } from "./secrets/show"
+// import { Link, Route, Switch, location } from "@hyperapp/router"
+import m from "mithril"
 
-import request from "browser-request"
-import urls from "./urls"
+// const state = {
+//   location: location.state,
+//   user: null,
+//   errors: [],
+//   newSecret: null,
+//   settings: {},
+// }
 
-import devtools from "hyperapp-devtools"
-// const devtools = (app) => app
+// const actions = {
+//   location: location.actions,
 
-// const app = withContext(_app)
+//   loadSettings: () => state => {
+//     request.get({ url: urls["settings"], json: true }, (err, response, body) => {
+//       if (err) {
+//         alert(`Couldn't load settings: ${err}`)
+//         return
+//       }
+//       if (response.status == 200) {
+//         actions.setSettings(body)
+//       }
+//     })
+//   },
 
-const state = {
-  location: location.state,
-  user: null,
-  errors: [],
-  newSecret: null,
-  settings: {},
-}
+//   storeNewSecret: newSecret => ({ newSecret }),
 
-const actions = {
-  location: location.actions,
+//   setSettings: settings => {
+//     return state => ({ settings })
+//   },
 
-  loadSettings: () => state => {
-    request.get({ url: urls["settings"], json: true }, (err, response, body) => {
-      if (err) {
-        alert(`Couldn't load settings: ${err}`)
-        return
-      }
-      if (response.status == 200) {
-        actions.setSettings(body)
-      }
-    })
-  },
+//   displaySaveSuccess: newSecret => {
+//     location.actions.go("/share")
+//     return { newSecret }
+//   },
 
-  storeNewSecret: newSecret => ({ newSecret }),
+//   addError: error => state => ({ errors: state.errors.concat([{ msg: error.message }]) }),
+// }
 
-  setSettings: settings => {
-    return state => ({ settings })
-  },
-
-  displaySaveSuccess: savedSecret => {
-    actions.location.go("/share")
-    return state => ({ savedSecret })
-  },
-
-  addError: error => state => ({ errors: state.errors.concat([{ msg: error.message }]) }),
-}
-
-const Home = () => {
-  return (
-    <section class="hero is-bold is-primary">
-      <div class="hero-body">
-        <div class="container">
+class Home {
+  view() {
+    return (
+      <section class="hero is-bold is-primary">
+        <div class="hero-body">
           <h1>A way to securely share a secret</h1>
           <h2 class="subtitle">'Cuz keeping secrets all to yourself ain't fun!</h2>
           <div class="level">
@@ -75,58 +66,80 @@ const Home = () => {
             secret has not been viewed before.
           </p>
         </div>
-      </div>
-    </section>
-  )
+      </section>
+    )
+  }
 }
 
-const Errors = () => ({ errors }) => {
-  if (!errors) return
-  return <ul>{errors.map(err => <li class="notification">{err.msg}</li>)}</ul>
+// const Errors = () => ({ errors }) => {
+//   if (!errors) return
+//   return <ul>{errors.map(err => <li class="notification">{err.msg}</li>)}</ul>
+// }
+
+class Link {
+  view(vnode) {
+    return (
+      <a
+        href={vnode.attrs.to}
+        onclick={e => {
+          m.route.set(vnode.attrs.to)
+          e.preventDefault()
+        }}
+        class={vnode.attrs.class}
+      >
+        {vnode.children}
+      </a>
+    )
+  }
 }
 
-const view = (state, actions) => (
-  <div class="container">
-    <nav class="navbar is-transparent" role="navigation" aria-label="main navigation">
-      <div class="navbar-brand">
-        <Link to="/" class="navbar-item">
-          <h1 class="title">🔐 SHARE</h1>
-        </Link>
-      </div>
-      <div class="navbar-menu is-active">
-        <div class="navbar-end">
-          <div class="navbar-item">
-            <Link to="/new" class="navbar-link">
-              New
+class Layout {
+  view(vnode) {
+    return (
+      <div class="container">
+        <nav class="navbar is-transparent" role="navigation" aria-label="main navigation">
+          <div class="navbar-brand">
+            <Link to="/" class="navbar-item">
+              <h1 class="title">🔐 SHARE</h1>
             </Link>
           </div>
+          <div class="navbar-menu is-active">
+            <div class="navbar-end">
+              <div class="navbar-item">
+                <Link to="/new" class="navbar-link">
+                  New
+                </Link>
+              </div>
+            </div>
+          </div>
+        </nav>
+
+        <div class="page">
+          {vnode.children}
         </div>
       </div>
-    </nav>
+    )
+  }
+}
 
-    <div class="">
-      <Switch>
-        <Route path="/" render={Home} />
-        <Route
-          path="/new"
-          render={({ location, match }) => (
-            <NewForm
-              done={secret => {
-                actions.storeNewSecret(secret)
-                actions.location.go(`/share`)
-              }}
-            />
-          )}
-        />
-        <Route path="/share" render={Share} />
-        <Route parent path="/show/:token" render={Show} />
-      </Switch>
-      <Errors />
-    </div>
-  </div>
-)
+let savedSecret = null
 
-const main = devtools(app)(state, actions, view, document.body)
+const storeSecret = secret => {
+  console.log("Done", secret)
+  savedSecret = secret
+  m.route.set("/share")
+}
 
-const unsubscribe = location.subscribe(main.location)
-main.loadSettings()
+m.route.prefix("")
+m.route(document.body, "/", {
+  "/": { view: () => m(Layout, m(Home)) },
+  "/new": { view: () => m(Layout, m(NewForm, { storeSecret })) },
+  "/share": { view: () => m(Layout, m(Share, { secret: savedSecret })) },
+  "/show/:token": {
+    onmatch: (args, requestedPath) => {
+      console.log(args, requestedPath)
+      return { view: () => m(Layout, m(Show)) }
+    },
+    //
+  },
+})

@@ -1,155 +1,121 @@
-import { h } from "hyperapp"
-import request from "browser-request"
+import m from "mithril"
 import urls from "../urls"
-import nestable from "../nestable"
 
 function capitalize(string) {
-  return string.charAt(0).toUpperCase() + string.slice(1)
+  return string.split('_').reduce((ret, s) => {
+    return ret + ' ' + (s === 'api' ? 'API': s.charAt(0).toUpperCase() + s.slice(1))
+  }, '')
 }
 
-const state = {
-  id: "",
-  name: "",
-  expiry: "",
-  fields: null,
-  error: null
-}
+class Secret {
+  constructor(token) {
+    this.id = ""
+    this.name = ""
+    this.expiry = ""
+    this.fields = null
+    this.error = null
 
-const actions = {
-  lookupToken(token) {
-    return (state, actions) => {
-      if (!token) {
-        location.actions.go("/")
-        return
-      }
-      if (!(state.data || state.error)) {
-        request.get(
-          { url: urls["showSecret"].replace("{token}", token), json: true },
-          (err, response, body) => {
-            if (err) {
-              alert(`Couldn't load secret: ${err}`)
-              return
-            }
-            console.debug(response)
-            switch (response.statusCode) {
-              case 200:
-                actions.setSecret(body.data)
-                break
-
-              case 404:
-                actions.setSecret({ error: "Not found" })
-
-              default:
-                break
-            }
-          },
-        )
-      }
+    if (!token) {
+      m.route.set("/")
+      return
     }
-  },
-
-  setSecret(data) {
-    return {
-      id: data.id,
-      name: data.meta.name,
-      expiry: data.expire_time,
+    if (!(this.data || this.error)) {
+      m.request({ url: urls["showSecret"].replace("{token}", token) })
+        .then(body => {
+          this.id = body.data.id
+          this.name = body.data.meta.name
+          this.expiry = body.data.expire_time
+        })
+        .catch(err => {
+          console.error(err)
+          this.error = "Not found"
+        })
     }
-  },
-
-  setSecretContents(data) {
-    delete data["lease"]
-    return { fields: data.fields }
-  },
+  }
 
   reveal() {
-    return (state, actions) => {
-      request.get(
-        { url: urls["showSecretContents"].replace("{token}", state.id), json: true },
-        (err, response, body) => {
-          if (err) {
-            alert(`Couldn't load secret contents: ${err}`)
-            return
-          }
-          console.debug(response)
-          switch (response.statusCode) {
-            case 200:
-              actions.setSecretContents(body.data)
-              break
-
-            case 404:
-              alert("Hmm, secret not found!")
-
-            default:
-              break
-          }
-        },
-      )
-    }
-  },
+    m.request({ url: urls["showSecretContents"].replace("{token}", this.id) })
+      .then(body => {
+        this.fields = body.data.fields
+      })
+      .catch(err => {
+        console.error(err)
+        alert("Hmm, secret not found!")
+      })
+  }
 }
 
-const view = (state, actions) => ({ location, match }) => {
-  if (!state.name) actions.lookupToken(match.params.token)
-  return (
-    <section class="hero is-bold is-success" >
-      <div class="hero-body is-text-center">
-        <div class="container">
-          {!state.name && !state.error && <p>Loading...</p>}
-          {state.name && (
-            <div>
-              <h1>{state.name}</h1>
+export class Show {
+  oninit(vnode) {
+    this.secret = new Secret(m.route.param("token"))
+    this.copyTexts = []
+  }
+
+  view(vnode) {
+    return (
+      <section class="hero is-bold is-success">
+        <div class="hero-body is-text-center">
+          <div class="container">
+            {!this.secret.name && !this.secret.error && <p>Loading...</p>}
+            {this.secret.name && (
+              <div>
+                <h1 class="title is-1">{this.secret.name}</h1>
+                <dl>
+                  <dt class="has-text-weight-bold is-size-5">Expires</dt>
+                  <dd>{this.secret.expiry}</dd>
+                </dl>
+              </div>
+            )}
+            {this.secret.fields && (
               <dl>
-                <dt>Expires</dt>
-                <dd>{state.expiry}</dd>
-              </dl>
-            </div>
-          )}
-          {state.fields && (
-            <dl>
-              {state.fields.reduce((acc, { name, value }, idx) => {
-                return acc.concat([
-                  <dt>{capitalize(name)}</dt>,
-                  <dd>
-                    <div class="columns">
-                      <div class="column is-10">
-                        <div class="control">
-                          <input
-                            value={value}
-                            class="input is-medium"
-                            oncreate={e => e.select()}
-                            id={`id_${name}`}
-                            readonly
-                          />
+                {this.secret.fields.reduce((acc, { name, value }, idx) => {
+                  this.copyTexts.push('Copy')
+                  return acc.concat([
+                    <dt class="has-text-weight-bold is-size-5">{capitalize(name)}</dt>,
+                    <dd>
+                      <div class="columns">
+                        <div class="column is-10">
+                          <div class="control">
+                            <input
+                              value={value}
+                              class="input is-medium"
+                              id={`id_${name}`}
+                              readonly
+                            />
+                          </div>
+                        </div>
+                        <div class="column is-2">
+                          <button
+                            onclick={e => {
+                              document.querySelector(`#id_${name}`).select()
+                              document.execCommand("copy")
+                              this.copyTexts[idx] = 'Copied!'
+                              setTimeout(() => {
+                                this.copyTexts[idx] = 'Copy'
+                                m.redraw()
+                              }, 2000);
+                            }}
+                            class="button is-medium is-white is-outlined"
+                          >
+                            <span>{this.copyTexts[idx]}</span>
+                          </button>
                         </div>
                       </div>
-                      <div class="column is-2">
-                        <button
-                          onclick={e => {
-                            document.querySelector(`#id_${name}`).select()
-                            document.execCommand("copy")
-                          }}
-                          class="button is-medium is-white is-outlined"
-                        >
-                          <span>Copy</span>
-                        </button>
-                      </div>
-                    </div>
-                  </dd>,
-                ])
-              }, [])}
-            </dl>
-          )}
-          {state.name &&
-            !state.fields && (
-              <button class="button is-medium is-danger" onclick={() => actions.reveal()}>
-                Reveal
-              </button>
+                    </dd>,
+                  ])
+                }, [])}
+              </dl>
             )}
-          {state.error && <p>Whoops! {state.error}</p>}
+            {this.secret.name &&
+              !this.secret.fields && (
+                <button class="button is-medium is-danger" onclick={() => this.secret.reveal()}>
+                  Reveal
+                </button>
+              )}
+            {this.secret.error && <p>Whoops! {this.secret.error}</p>}
+          </div>
         </div>
-      </div>
-    </section>
-  )
+      </section>
+    )
+  }
 }
-
-export const Show = nestable(state, actions, view)

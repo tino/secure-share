@@ -1,58 +1,64 @@
-import { h } from "hyperapp"
-import { location } from "@hyperapp/router"
-import request from "browser-request"
-import nestable from "../nestable"
+import m from "mithril"
+
 import urls from "../urls"
 
-export const NewForm = nestable(
-  // STATE
-  {
-    name: "",
-    field1Type: "username",
-    field1Value: "",
-    field2Type: "password",
-    field2Value: "",
+const state = {
+  name: "",
+  field1Type: "username",
+  field1Value: "",
+  field2Type: "password",
+  field2Value: "",
+  saving: false,
+}
+
+const actions = {
+  updateState(update) {
+    return update
   },
 
-  // ACTIONS
-  {
-    updateState(update) {
-      return update
-    },
-    saveNew: (done) => (state, actions) => {
-      const { name, field1Type, field1Value, field2Type, field2Value } = state
-      if (!name) {
-        throw new Error("Please fill in a name!")
-      }
-      if (!(field1Value || field2Value)) {
-        throw new Error("Please fill at least one field")
-      }
-      request.post(
-        {
-          url: urls["new"],
-          json: {
-            name,
-            fields: [
-              { name: field1Type, value: field1Value },
-              { name: field2Type, value: field2Value },
-            ],
-          },
-        },
-        (err, response, body) => {
-          if (err) {
-            alert(err)
-            return false
-          }
-          if (response.status == 200) {
-            done(body)
-          }
-        },
-      )
-    },
-  },
+  saveNew(storeSecret) {
+    state.saving = true
+    const { name, field1Type, field1Value, field2Type, field2Value } = state
+    if (!name) {
+      throw new Error("Please fill in a name!")
+    }
+    if (!(field1Value || field2Value)) {
+      throw new Error("Please fill at least one field")
+    }
+    m.request({
+      method: "POST",
+      url: urls["new"],
+      data: {
+        name,
+        fields: [
+          { name: field1Type, value: field1Value },
+          { name: field2Type, value: field2Value },
+        ],
+      },
+    }).then((body) => {
+      state.saving = false
+      storeSecret(body)
+      // m.route.set('/share')
+    }).catch(e => {
+      state.saving = false
+      alert(`An error occured while saving: ${e.message}`)
+      return false
+    })
+  }
+}
 
-  // VIEW
-  (state, actions) => ({ done }) => {
+export class NewForm {
+  constructor(vnode) {
+    this.storeSecret = vnode.attrs.storeSecret
+  }
+  save(done) {
+    try {
+      actions.saveNew(this.storeSecret)
+    } catch (error) {
+      alert(error)
+    }
+  }
+  view(vnode) {
     return (
       <section class="hero">
         <div class="hero-body">
@@ -60,14 +66,14 @@ export const NewForm = nestable(
             <form
               class="new-form"
               onsubmit={e => {
-                actions.saveNew(done)
                 e.preventDefault()
+                this.save(vnode.attrs.done)
               }}
               onkeypress={e => {
                 const keyCode = e.keyCode || e.which
                 if (keyCode === 13) {
-                  actions.saveNew(done)
                   e.preventDefault()
+                  this.save(vnode.attrs.done)
                 }
               }}
             >
@@ -79,8 +85,9 @@ export const NewForm = nestable(
                     name="name"
                     type="text"
                     placeholder="Eg. &quot;New email account for John&quot;"
-                    oninput={e => actions.updateState({ name: e.target.value })}
-                    oncreate={e => e.focus()}
+                    value={state.name}
+                    oninput={e => state.name = e.target.value }
+                    oncreate={e => e.dom.focus()}
                   />
                   <span class="is-size-6 has-text-danger">
                     Don't put any sensitive information in this field!
@@ -93,7 +100,7 @@ export const NewForm = nestable(
                   <div className="select">
                     <select
                       name="field1Type"
-                      oninput={e => actions.updateState({ field1Type: e.target.value })}
+                      oninput={e => state.field1Type = e.target.value }
                       id=""
                     >
                       <option value="username">Username</option>
@@ -109,7 +116,7 @@ export const NewForm = nestable(
                         name="value"
                         type="text"
                         placeholder="a secret value"
-                        oninput={e => actions.updateState({ field1Value: e.target.value })}
+                        oninput={e => state.field1Value = e.target.value }
                       />
                     </div>
                   </div>
@@ -121,7 +128,7 @@ export const NewForm = nestable(
                   <div className="select">
                     <select
                       name="field2Type"
-                      oninput={e => actions.updateState({ field2Type: e.target.value })}
+                      oninput={e => state.field2Type = e.target.value }
                       id=""
                     >
                       <option value="password">Password</option>
@@ -137,7 +144,7 @@ export const NewForm = nestable(
                         name="value"
                         type="text"
                         placeholder="a secret value"
-                        oninput={e => actions.updateState({ field2Value: e.target.value })}
+                        oninput={e => state.field2Value = e.target.value }
                       />
                     </div>
                   </div>
@@ -162,7 +169,12 @@ export const NewForm = nestable(
                         </button>
                       </div>
                       <div class="control">
-                        <input type="submit" class="button is-link" value="Submit" />
+                        <input
+                          type="submit"
+                          class="button is-link"
+                          value="Submit"
+                          disabled={state.saving}
+                        />
                       </div>
                     </div>
                   </div>
@@ -173,5 +185,5 @@ export const NewForm = nestable(
         </div>
       </section>
     )
-  },
-)
+  }
+}

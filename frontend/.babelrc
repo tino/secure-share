@@ -9,5 +9,5 @@
       }
     ]
   ],
-  "plugins": [["transform-react-jsx", { "pragma": "h" }], "transform-object-rest-spread"]
+  "plugins": [["transform-react-jsx", { "pragma": "m" }], "transform-object-rest-spread"]
 }
