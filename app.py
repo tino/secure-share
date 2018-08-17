@@ -1,7 +1,7 @@
-from apistar import App, Include, Route, http, exceptions
-
 import secrets
+
 import settings
+from apistar import App, Include, Route, exceptions, http
 
 
 def frontend():

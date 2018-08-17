@@ -23,9 +23,12 @@ See it at http://localhost:1234!
 ## TODO
 
 - [x] Welcome text
-- [ ] Custom fields
 - [x] Error on backend 404 instead of loading...
+- [x] Remove backend views
+- [ ] Wrap in docker(-compose) for easy deploy
+- [ ] Out of band password
+- [ ] Custom fields
 - [ ] Single-view secrets
 - [ ] Better error display (and removal)
-- [x] Remove backend views
 - [ ] Custom lifetimes
+- [ ] Replace apistar with aiohttp...
