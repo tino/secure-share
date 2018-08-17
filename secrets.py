@@ -1,11 +1,9 @@
 import datetime
-import json
 import os
 
 import hvac
-from apistar import App, Route, exceptions, types, validators
-
 import settings
+from apistar import App, Route, exceptions, types, validators
 from vault import master_client
 
 CUBBYHOLE_PATH = os.path.join(settings.VAULT_SECRET_BASE, "secret")
@@ -29,7 +27,7 @@ def new_cubbyhole(secret: Secret):
     token = master_client.create_token(
         policies=["single-secure-share"], lease="168h", meta={"name": secret.name}
     )
-    client = hvac.Client(settings.VAULT_URL, token=token["auth"]["client_token"])
+    client = hvac.Client(settings.VAULT_ADDR, token=token["auth"]["client_token"])
     client.write(CUBBYHOLE_PATH, lease=f"{7 * 24}h", fields=[dict(f) for f in secret.fields])
     return token
 
@@ -49,7 +47,7 @@ def new_secret(app: App, secret: Secret):
 
 
 def show_secret(token: str):
-    client = hvac.Client(settings.VAULT_URL, token=token)
+    client = hvac.Client(settings.VAULT_ADDR, token=token)
     try:
         return client.lookup_token()
     except hvac.exceptions.Forbidden:
@@ -57,7 +55,7 @@ def show_secret(token: str):
 
 
 def show_secret_contents(token: str):
-    client = hvac.Client(settings.VAULT_URL, token=token)
+    client = hvac.Client(settings.VAULT_ADDR, token=token)
     try:
         return client.read(CUBBYHOLE_PATH)
     except hvac.exceptions.Forbidden:

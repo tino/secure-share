@@ -38,7 +38,7 @@ routes = [
     Route("/api/settings", method="GET", handler=settings_),
     Include("/api/secrets", name="secrets", routes=secrets.routes),
     Route("/", method="GET", handler=frontend, name="home"),
-    Route("/{path}", method="GET", handler=frontend, name="catchall"),
+    Route("/{+path}", method="GET", handler=frontend, name="catchall"),
 ]
 
 app = App(routes=routes, static_dir=settings.STATIC_DIR, event_hooks=[CORSHook()])

@@ -1,0 +1,23 @@
+-i https://pypi.python.org/simple
+apistar==0.5.22
+certifi==2018.4.16
+chardet==3.0.4
+click==6.7
+docopt==0.6.2
+envparse==0.2.0
+hvac==0.5.0
+idna==2.6
+jedi==0.12.0
+jinja2==2.10
+markupsafe==1.0
+parso==0.2.1
+prompt-toolkit==1.0.15
+ptpython==0.41
+pygments==2.2.0
+pyyaml==3.12
+requests==2.18.4
+six==1.11.0
+urllib3==1.22
+wcwidth==0.1.7
+werkzeug==0.14.1
+whitenoise==3.3.1

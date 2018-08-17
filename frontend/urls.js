@@ -1,4 +1,4 @@
-const base_url = "http://localhost:5000"
+const base_url = ""
 const urls = {
   new: `${base_url}/api/secrets/new`,
   settings: `${base_url}/api/settings`,
