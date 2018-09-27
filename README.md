@@ -14,7 +14,7 @@ or use it to generate a new, non-root token (after setting the correct
 
 `vault token create`
 
-Run the backend: `python app.py`
+Run the backend: `python run_app.py`
 
 Run the frontend: `yarn dev`
 
@@ -25,7 +25,8 @@ See it at http://localhost:1234!
 - [x] Welcome text
 - [x] Error on backend 404 instead of loading...
 - [x] Remove backend views
-- [ ] Wrap in docker(-compose) for easy deploy
+- [x] Wrap in docker(-compose) for easy deploy
+- [ ] Move from apistar to something maintained
 - [ ] Out of band password
 - [ ] Custom fields
 - [ ] Single-view secrets

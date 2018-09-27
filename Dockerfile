@@ -17,4 +17,5 @@ RUN pip install -r requirements.txt
 
 COPY ./ /usr/src/app/
 
+EXPOSE 8000
 CMD [ "python", "run_app.py" ]
