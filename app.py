@@ -2,6 +2,7 @@ import secrets
 
 import settings
 from aiohttp import web
+from vault import vault_master
 
 
 async def frontend(request):
@@ -23,6 +24,7 @@ app.add_routes(routes)
 app.add_subapp("/api/secrets/", secrets.app)
 # Need to do it this way to make subapp routes work before it?
 app.router.add_route("GET", "/{path:.*}", frontend)
+app.cleanup_ctx.append(vault_master)
 
 # Dev server
 if __name__ == "__main__":

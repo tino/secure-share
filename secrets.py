@@ -1,11 +1,10 @@
 import datetime
 import os
 
-import hvac
+import async_hvac
 import settings
 from aiohttp import web
 from marshmallow import Schema, fields, validate
-from vault import master_client
 from webargs.aiohttpparser import use_args
 
 CUBBYHOLE_PATH = os.path.join(settings.VAULT_SECRET_BASE, "secret")
@@ -27,24 +26,27 @@ class Secret(Schema):
         strict = True
 
 
-def new_cubbyhole(secret: Secret):
+async def new_cubbyhole(secret, master_client):
     """
     Create a new token with a lifetime of a week, and with it store the secret
     in a cubbyhole.
     """
-    token = master_client.create_token(
+    token = await master_client.create_token(
         policies=["single-secure-share"], lease="168h", meta={"name": secret["name"]}
     )
-    client = hvac.Client(settings.VAULT_ADDR, token=token["auth"]["client_token"])
-    client.write(
+    client = async_hvac.AsyncClient(
+        settings.VAULT_ADDR, token=token["auth"]["client_token"]
+    )
+    await client.write(
         CUBBYHOLE_PATH, lease=f"{7 * 24}h", fields=[dict(f) for f in secret["fields"]]
     )
+    await client.close()
     return token
 
 
 @use_args(Secret)
 async def new_secret(request, secret: Secret):
-    token = new_cubbyhole(secret)
+    token = await new_cubbyhole(secret, request.config_dict["vault_master"])
     return web.json_response(
         {
             "url": str(
@@ -64,21 +66,25 @@ async def new_secret(request, secret: Secret):
 @use_args({"token": fields.Str(required=True, location="match_info")})
 async def show_secret(request, kwargs):
     token = kwargs["token"]
-    client = hvac.Client(settings.VAULT_ADDR, token=token)
+    client = async_hvac.AsyncClient(settings.VAULT_ADDR, token=token)
     try:
-        return web.json_response(client.lookup_token())
-    except hvac.exceptions.Forbidden:
+        return web.json_response(await client.lookup_token())
+    except async_hvac.exceptions.Forbidden:
         raise web.HTTPNotFound()
+    finally:
+        await client.close()
 
 
 @use_args({"token": fields.Str(required=True, location="match_info")})
 async def show_secret_contents(request, kwargs):
     token = kwargs["token"]
-    client = hvac.Client(settings.VAULT_ADDR, token=token)
+    client = async_hvac.AsyncClient(settings.VAULT_ADDR, token=token)
     try:
-        return web.json_response(client.read(CUBBYHOLE_PATH))
-    except hvac.exceptions.Forbidden:
+        return web.json_response(await client.read(CUBBYHOLE_PATH))
+    except async_hvac.exceptions.Forbidden:
         raise web.HTTPNotFound()
+    finally:
+        await client.close()
 
 
 routes = [
