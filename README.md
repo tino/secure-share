@@ -18,7 +18,7 @@ Run the backend: `python run_app.py`
 
 Run the frontend: `yarn dev`
 
-See it at http://localhost:1234!
+See it at http://localhost:5000!
 
 ## TODO
 

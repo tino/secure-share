@@ -1,4 +1,4 @@
-version: '2'
+version: "2"
 services:
   backend:
     build: ./
@@ -18,4 +18,7 @@ services:
     cap_add:
       - IPC_LOCK
     environment:
+      # Warning: don't use this token, or any hardcoded token for that matter
+      # but follow the docs on how to properly deploy Vault:
+      # https://www.vaultproject.io/intro/getting-started/deploy.html
       VAULT_DEV_ROOT_TOKEN_ID: 60eb71f5-f3fd-7435-ff78-49b7dfae9039
