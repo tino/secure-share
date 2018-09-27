@@ -28,4 +28,4 @@ app.cleanup_ctx.append(vault_master)
 
 # Dev server
 if __name__ == "__main__":
-    web.run_app(app, port=5000)
+    web.run_app(app, port=8000)
