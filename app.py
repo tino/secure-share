@@ -1,3 +1,4 @@
+import os
 import secrets
 
 import settings
@@ -6,7 +7,7 @@ from vault import vault_master
 
 
 async def frontend(request):
-    return web.FileResponse("frontend/dist/index.html")
+    return web.FileResponse(os.path.join(settings.STATIC_DIR, "index.html"))
 
 
 async def settings_(request):
