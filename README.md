@@ -27,9 +27,8 @@ See it at http://localhost:1234!
 - [x] Remove backend views
 - [x] Wrap in docker(-compose) for easy deploy
 - [x] Move from apistar to something maintained
+- [ ] Single-view secrets
 - [ ] Out of band password
 - [ ] Custom fields
-- [ ] Single-view secrets
 - [ ] Better error display (and removal)
 - [ ] Custom lifetimes
-- [ ] Replace apistar with aiohttp...
