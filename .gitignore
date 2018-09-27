@@ -103,3 +103,6 @@ ENV/
 
 # Frontend
 frontend/node_modules/
+
+# Local compose settings
+docker-compose.override.yml
