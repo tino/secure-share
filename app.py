@@ -1,48 +1,29 @@
 import secrets
 
 import settings
-from apistar import App, Include, Route, exceptions, http
+from aiohttp import web
 
 
-def frontend():
-    with open("frontend/dist/index.html") as f:
-        return http.Response(f.read(), headers=dict(content_type="text/html"))
+async def frontend(request):
+    return web.FileResponse("frontend/dist/index.html")
 
 
-def settings_() -> dict:
-    return {"base_url": settings.BASE_URL}
-
-
-class CORSHook:
-
-    def on_response(
-        self, request: http.Request, response: http.Response, exc: Exception
-    ):
-        response.headers["Access-Control-Allow-Origin"] = "*"
-        response.headers["Access-Control-Allow-Methods"] = "*"
-        response.headers["Access-Control-Allow-Headers"] = (
-            "DNT,User-Agent,X-Requested-With,If-Modified-Since,"
-            "Cache-Control,Content-Type,Range"
-        )
-
-        if isinstance(exc, exceptions.MethodNotAllowed) and request.method == "OPTIONS":
-            response.headers["Content-Type"] = "text/html"
-            response.status_code = 204
-            response.content = b""
-            return response
-
-        return response
+async def settings_(request):
+    return web.json_response({"base_url": settings.BASE_URL})
 
 
 routes = [
-    Route("/api/settings", method="GET", handler=settings_),
-    Include("/api/secrets", name="secrets", routes=secrets.routes),
-    Route("/", method="GET", handler=frontend, name="home"),
-    Route("/{+path}", method="GET", handler=frontend, name="catchall"),
+    web.get("/api/settings", handler=settings_),
+    web.get("/", handler=frontend, name="home"),
+    web.static("/static", settings.STATIC_DIR),
 ]
 
-app = App(routes=routes, static_dir=settings.STATIC_DIR, event_hooks=[CORSHook()])
+app = web.Application()
+app.add_routes(routes)
+app.add_subapp("/api/secrets/", secrets.app)
+# Need to do it this way to make subapp routes work before it?
+app.router.add_route("GET", "/{path:.*}", frontend)
 
 # Dev server
 if __name__ == "__main__":
-    app.serve("127.0.0.1", 5000, debug=True)
+    web.run_app(app, port=5000)

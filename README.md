@@ -26,7 +26,7 @@ See it at http://localhost:1234!
 - [x] Error on backend 404 instead of loading...
 - [x] Remove backend views
 - [x] Wrap in docker(-compose) for easy deploy
-- [ ] Move from apistar to something maintained
+- [x] Move from apistar to something maintained
 - [ ] Out of band password
 - [ ] Custom fields
 - [ ] Single-view secrets

@@ -3,20 +3,28 @@ import os
 
 import hvac
 import settings
-from apistar import App, Route, exceptions, types, validators
+from aiohttp import web
+from marshmallow import Schema, fields, validate
 from vault import master_client
+from webargs.aiohttpparser import use_args
 
 CUBBYHOLE_PATH = os.path.join(settings.VAULT_SECRET_BASE, "secret")
 
 
-class SecretField(types.Type):
-    name = validators.String(max_length=100)
-    value = validators.String(max_length=100)
+class SecretField(Schema):
+    name = fields.Str(validate=validate.Length(max=100, error="String is too long"))
+    value = fields.Str(validate=validate.Length(max=100, error="String is too long"))
+
+    class Meta:
+        strict = True
 
 
-class Secret(types.Type):
-    name = validators.String(max_length=100)
-    fields = validators.Array(items=SecretField, min_items=1)
+class Secret(Schema):
+    name = fields.Str(validate=validate.Length(max=100, error="String is too long"))
+    fields = fields.Nested(SecretField, many=True)
+
+    class Meta:
+        strict = True
 
 
 def new_cubbyhole(secret: Secret):
@@ -25,45 +33,59 @@ def new_cubbyhole(secret: Secret):
     in a cubbyhole.
     """
     token = master_client.create_token(
-        policies=["single-secure-share"], lease="168h", meta={"name": secret.name}
+        policies=["single-secure-share"], lease="168h", meta={"name": secret["name"]}
     )
     client = hvac.Client(settings.VAULT_ADDR, token=token["auth"]["client_token"])
-    client.write(CUBBYHOLE_PATH, lease=f"{7 * 24}h", fields=[dict(f) for f in secret.fields])
+    client.write(
+        CUBBYHOLE_PATH, lease=f"{7 * 24}h", fields=[dict(f) for f in secret["fields"]]
+    )
     return token
 
 
-def new_secret(app: App, secret: Secret):
+@use_args(Secret)
+async def new_secret(request, secret: Secret):
     token = new_cubbyhole(secret)
-    return {
-        "url": app.reverse_url(
-            "secrets:show_secret", token=token["auth"]["client_token"]
-        ),
-        "token": token["auth"]["client_token"],
-        "expiration": (
-            datetime.datetime.now()
-            + datetime.timedelta(seconds=token["auth"]["lease_duration"])
-        ).isoformat(),
-    }
+    return web.json_response(
+        {
+            "url": str(
+                request.app.router["show_secret"].url_for(
+                    token=token["auth"]["client_token"]
+                )
+            ),
+            "token": token["auth"]["client_token"],
+            "expiration": (
+                datetime.datetime.now()
+                + datetime.timedelta(seconds=token["auth"]["lease_duration"])
+            ).isoformat(),
+        }
+    )
 
 
-def show_secret(token: str):
+@use_args({"token": fields.Str(required=True, location="match_info")})
+async def show_secret(request, kwargs):
+    token = kwargs["token"]
     client = hvac.Client(settings.VAULT_ADDR, token=token)
     try:
-        return client.lookup_token()
+        return web.json_response(client.lookup_token())
     except hvac.exceptions.Forbidden:
-        raise exceptions.NotFound
+        raise web.HTTPNotFound()
 
 
-def show_secret_contents(token: str):
+@use_args({"token": fields.Str(required=True, location="match_info")})
+async def show_secret_contents(request, kwargs):
+    token = kwargs["token"]
     client = hvac.Client(settings.VAULT_ADDR, token=token)
     try:
-        return client.read(CUBBYHOLE_PATH)
+        return web.json_response(client.read(CUBBYHOLE_PATH))
     except hvac.exceptions.Forbidden:
-        raise exceptions.NotFound
+        raise web.HTTPNotFound()
 
 
 routes = [
-    Route("/new", method="POST", handler=new_secret),
-    Route("/show/{token}", method="GET", handler=show_secret),
-    Route("/show/{token}/contents", method="GET", handler=show_secret_contents),
+    web.post("/new", handler=new_secret),
+    web.get("/show/{token}", handler=show_secret, name="show_secret"),
+    web.get("/show/{token}/contents", handler=show_secret_contents),
 ]
+
+app = web.Application()
+app.add_routes(routes)

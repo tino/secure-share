@@ -4,10 +4,12 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-apistar = "==0.5.22"
-"jinja2" = "*"
-hvac = "*"
+async-hvac = "*"
 envparse = "*"
 ptpython = "*"
+aiohttp = "*"
+aiodns = "*"
+cchardet = "*"
+webargs = "*"
 
 [dev-packages]
