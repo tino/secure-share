@@ -1,4 +1,14 @@
+# Two stage build with the frontend files first
+FROM node:10-alpine as frontend
+COPY ./frontend /frontend
+RUN cd /frontend && \
+    yarn install && \
+    yarn dist
+
+# Seconds stage for the backend
 FROM python:3.6-alpine
+COPY --from=frontend /frontend /usr/src/frontend
+ENV STATIC_DIR=/usr/src/frontend/dist
 
 RUN apk add --update \
     python3-dev \

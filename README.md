@@ -27,6 +27,7 @@ See it at http://localhost:5000!
 - [x] Remove backend views
 - [x] Wrap in docker(-compose) for easy deploy
 - [x] Move from apistar to something maintained
+- [ ] Fix base url issues
 - [ ] Single-view secrets
 - [ ] Out of band password
 - [ ] Custom fields
