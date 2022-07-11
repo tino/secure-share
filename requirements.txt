@@ -17,7 +17,7 @@ multidict==4.7.6
 parso==0.8.2
 prompt-toolkit==1.0.18
 ptpython==0.41
-pycares==3.1.1
+pycares==4.2.0
 pycparser==2.20
 pygments==2.8.1
 six==1.15.0
